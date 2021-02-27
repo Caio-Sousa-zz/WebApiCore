@@ -70,12 +70,12 @@ namespace WebApiCore.Controllers
         public ActionResult Post(Product p)
         {
             if (p.Id == 0)
-                return BadRequest();
+                return CustomResponse();
 
             // add no banco
 
             // return Ok(p); // Mesma coisa mas retorna 200
-            return CreatedAtAction(nameof(Post), p);
+            return CustomResponse(p);
         }
 
         [HttpPut("{id}")]
