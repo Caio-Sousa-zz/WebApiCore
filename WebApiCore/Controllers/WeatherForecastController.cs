@@ -4,12 +4,14 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using WebApiCore.Model;
 
 namespace WebApiCore.Controllers
 {
+    //[ApiConventionType(typeof(DefaultApiConventions))]
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : MainController
+    public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
         {
@@ -25,7 +27,7 @@ namespace WebApiCore.Controllers
         }
 
         [HttpGet("get-weather")]
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<WeatherForecast> GetWeather()
         {
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -59,89 +61,50 @@ namespace WebApiCore.Controllers
         }
 
         [HttpGet("get")]
-        public string Get(int id)
+        public string Get()
         {
             return "Hello World";
         }
 
-        [HttpPost]
+        [HttpPost("post-normal")]
         [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
         public ActionResult Post(Product p)
         {
-            if (p.Id == 0)
-                return CustomResponse();
+            //if (p.Id == 0)
+              //  return CustomResponse();
 
             // add no banco
 
             // return Ok(p); // Mesma coisa mas retorna 200
-            return CustomResponse(p);
+           // return CustomResponse(p);
+
+            return Ok();
         }
 
         [HttpPost("post-teste")]
         [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
         public ActionResult PostTest(Product p)
         {
-            return CreatedAtAction(nameof(Post), p);
+            return CreatedAtAction(nameof(PostTest), p);
         }
 
-        [HttpPut("{id}")]
         [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
-        public ActionResult Put(int id,
-                        [FromBody] string value,
-                        [FromForm] Product prod)
+        [HttpPut("{id}")]
+        public ActionResult Put(int id, [FromBody] string value, [FromForm] Product prod)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            //if (!ModelState.IsValid) return BadRequest();
 
-            if (id != prod.Id) return NotFound();
+            //if (id != prod.Id) return NotFound();
 
             return NoContent();
         }
 
-        [HttpDelete]
-        public void Delete(int id,
-                           [FromHeader] string header,
-                           [FromQuery] string queryString)
+        [HttpDelete("delete/{id}")]
+        public void Delete(int id)
         {
 
         }
-    }
-
-    [ApiController]
-    public abstract class MainController : ControllerBase
-    {
-        protected ActionResult CustomResponse(object result = null)
-        {
-            if (ValidOperation())
-                return Ok(new
-                {
-                    success = true,
-                    data = result
-                });
-
-            return BadRequest(new
-            {
-                success = false,
-                erros = ObterErros()
-            });
-        }
-
-        public bool ValidOperation()
-        {
-            // Validações
-            return true;
-        }
-
-        protected string ObterErros()
-        {
-            return "";
-        }
-    }
-
-    public class Product
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
     }
 }
