@@ -67,6 +67,7 @@ namespace WebApiCore.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(Product), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
         public ActionResult Post(Product p)
         {
             if (p.Id == 0)
@@ -78,13 +79,24 @@ namespace WebApiCore.Controllers
             return CustomResponse(p);
         }
 
+        [HttpPost("post-teste")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
+        public ActionResult PostTest(Product p)
+        {
+            return CreatedAtAction(nameof(Post), p);
+        }
+
         [HttpPut("{id}")]
-        public void Put(int id,
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
+        public ActionResult Put(int id,
                         [FromBody] string value,
                         [FromForm] Product prod)
         {
+            if (!ModelState.IsValid) return BadRequest();
 
+            if (id != prod.Id) return NotFound();
 
+            return NoContent();
         }
 
         [HttpDelete]
